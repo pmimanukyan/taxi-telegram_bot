@@ -1,1 +1,1 @@
-# hse taxi-telegram_bot
+# hse-taxi telegram_bot
