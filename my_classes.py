@@ -34,13 +34,15 @@ class YandexGeocoderAPI:
 
     def get_coordinates(self, address):
         json_file = self.get_json_for_coordinates(address)
-        coordinates = json_file['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos']
+        coordinates = json_file['response']['GeoObjectCollection'][
+            'featureMember'][0]['GeoObject']['Point']['pos']
         lon, lat = coordinates.split()
         return f'{lon},{lat}'
 
     def get_address(self, coordinates):
         json_file = self.get_json_for_coordinates(coordinates)
-        address = json_file['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
+        address = json_file['response']['GeoObjectCollection'][
+            'featureMember'][0]['GeoObject']['metaDataProperty'][
             'GeocoderMetaData']['AddressDetails']['Country']['AddressLine']
         return address
 
@@ -62,17 +64,21 @@ class YandexTaxiAPI:
             clid = data_[1]
         return YandexTaxiAPI(apikey, clid)
 
-    def get_json(self, geocoder: YandexGeocoderAPI, taxi_class, address_from, address_to):
+    def get_json(self, geocoder: YandexGeocoderAPI,
+                 taxi_class, address_from, address_to):
         coordinates_from = geocoder.get_coordinates(address_from)
         coordinates_to = geocoder.get_coordinates(address_to)
         main_page = 'https://taxi-routeinfo.taxi.yandex.net/taxi_info?'
-        params = f'clid={self.clid}&apikey={self.apikey}&rll={coordinates_from}~{coordinates_to}&class={taxi_class}'
+        params = f'clid={self.clid}&apikey={self.apikey}&rll=' \
+                 f'{coordinates_from}~{coordinates_to}&class={taxi_class}'
         page = main_page + params
         response = requests.get(page)
         return response.json()
 
-    def get_price_time_distance(self, geocoder: YandexGeocoderAPI, taxi_class, address_from, address_to) -> list:
-        json_file = self.get_json(geocoder, taxi_class, address_from, address_to)
+    def get_price_time_distance(self, geocoder: YandexGeocoderAPI,
+                                taxi_class, address_from, address_to) -> list:
+        json_file = self.get_json(geocoder,
+                                  taxi_class, address_from, address_to)
         return [str(json_file['options'][0]['price']) + 'р',
                 str(json_file['time'] / 60) + ' мин',
                 str(json_file['distance'] / 1000) + ' км']
@@ -85,16 +91,19 @@ class Citymobil:
         self.address_to = address_to_
 
     def get_price(self):
-        """For non-headless version(visual opening Chrome) you can comment first 3 strings and recomment 4-th."""
+        """For non-headless version(visual opening Chrome)
+         you can comment first 3 strings and recomment 4-th."""
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
         driver = webdriver.Chrome(chrome_options=options)
         # driver = webdriver.Chrome()
         driver.get('https://city-mobil.ru')
         time.sleep(2)
-        driver.find_element_by_class_name('Button_button__2WaUX').click()  # geolocation test
+        # geolocation test
+        driver.find_element_by_class_name('Button_button__2WaUX').click()
         time.sleep(1)
-        driver.find_element_by_class_name('Button_button__2sv0Y').click()  # order button
+        # order button
+        driver.find_element_by_class_name('Button_button__2sv0Y').click()
         time.sleep(1)
         input_address = driver.find_elements_by_class_name('mtw-input')
         input_address[0].send_keys(self.address_from)
