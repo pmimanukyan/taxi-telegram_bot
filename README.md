@@ -3,7 +3,7 @@
 Summer internship project
 
 A telegram bot that finds the aggregator with the lowest cost of a taxi on a specific route. \
-Considered the two most popular taxi aggregators in Russia - Yandex taxi and Citymobil
+Considered the two most popular taxi aggregators in Russia - Yandex-taxi and Citymobil
 
 Main tools:
   1. Yandex geocoding API
