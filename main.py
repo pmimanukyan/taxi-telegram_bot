@@ -69,7 +69,6 @@ def to_(update: Update, context: CallbackContext):
 
 def res(update: Update, context: CallbackContext):
     """Checks data, finds results and ends the conversation."""
-
     yandextaxi_class_dict = {
         'Economy': 'econom',
         'Comfort': 'business',
