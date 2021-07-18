@@ -14,7 +14,8 @@ from telegram.ext import (
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
 )
 
 logger = logging.getLogger(__name__)
@@ -25,12 +26,14 @@ data = []  # [class, from, to]
 
 def start(update: Update, context: CallbackContext):
     """Starts the conversation and asks the user to choose a class of taxi."""
-    reply_keyboard = [['Economy', 'Comfort', 'ComfortPLUS', 'Business', 'Minivan']]
+    reply_keyboard = [['Economy', 'Comfort', 'ComfortPLUS',
+                       'Business', 'Minivan']]
 
     update.message.reply_text(
         'Выбери класс такси на котором хочешь поехать:',
         reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, one_time_keyboard=True, input_field_placeholder='Class?'
+            reply_keyboard, one_time_keyboard=True,
+            input_field_placeholder='Class?'
         ),
     )
     return TARIFF
@@ -57,7 +60,7 @@ def from_(update: Update, context: CallbackContext):
 
 
 def to_(update: Update, context: CallbackContext):
-    """Stores the info about route taxi_class(tariff) and asks for a route start."""
+    """Stores the info about route taxi_class and asks for a route start."""
     user = update.message.from_user
     logger.info("FROM: %s", update.message.text)
     data.append(update.message.text)
@@ -69,6 +72,7 @@ def to_(update: Update, context: CallbackContext):
 
 def res(update: Update, context: CallbackContext):
     """Checks data, finds results and ends the conversation."""
+
     yandextaxi_class_dict = {
         'Economy': 'econom',
         'Comfort': 'business',
@@ -90,7 +94,8 @@ def res(update: Update, context: CallbackContext):
 
     geocoder = my_classes.YandexGeocoderAPI.create_object()
     yandex_taxi = my_classes.YandexTaxiAPI.create_object()
-    citymobil = my_classes.Citymobil(citymobil_class_dict[data[0]], data[1], data[2])
+    citymobil = my_classes.Citymobil(citymobil_class_dict[data[0]],
+                                     data[1], data[2])
 
     update.message.reply_text(
         'Теперь проверь данные!\n\n'
@@ -101,12 +106,16 @@ def res(update: Update, context: CallbackContext):
         f'Адрес назначения - {geocoder.get_correct_address(data[2])}.\n'
     )
     update.message.reply_text(
-        'Если вдруг найдешь неточности в указанном адресе, то тебе наказание пройти это всё заново через команду /start'
+        'Если вдруг найдешь неточности в указанном адресе,'
+        ' то тебе наказание пройти это всё заново через команду /start'
         ' и указать более точный адрес (именно по формату ввода!!!)\n'
         'Рассчитываю стоимость поездки, осталось немного подождать ...\n'
     )
 
-    list_ = yandex_taxi.get_price_time_distance(geocoder, yandextaxi_class_dict[data[0]], data[1], data[2])
+    list_ = yandex_taxi.get_price_time_distance(geocoder,
+                                                yandextaxi_class_dict[data[0]],
+                                                data[1],
+                                                data[2])
     yandex_price = str(int(list_[0][:len(list_[0]) - 3])) + 'р'
     time = list_[1]
     distance = list_[2]
@@ -120,7 +129,8 @@ def res(update: Update, context: CallbackContext):
         f'Ситмобил - {citymobil_price}\n'
     )
     # checking for best agregator
-    if int(yandex_price[:len(yandex_price) - 1]) <= int(citymobil_price[:len(citymobil_price) - 1]):
+    if int(yandex_price[:len(yandex_price) - 1]) <= \
+            int(citymobil_price[:len(citymobil_price) - 1]):
         best_agregator = 'Яндекс-такси'
     else:
         best_agregator = 'Ситимобил'
@@ -136,7 +146,8 @@ def cancel(update: Update, context: CallbackContext) -> int:
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
     update.message.reply_text(
-        'Пока дружище! Надеюсь я тебе помог и ты ещё вернешься!', reply_markup=ReplyKeyboardRemove()
+        'Пока дружище! Надеюсь я тебе помог и ты ещё вернешься!',
+        reply_markup=ReplyKeyboardRemove()
     )
 
     return ConversationHandler.END
@@ -155,7 +166,11 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            TARIFF: [MessageHandler(Filters.regex('^(Economy|Comfort|ComfortPLUS|Business|Minivan)$'), from_)],
+            TARIFF: [MessageHandler(
+                Filters.regex(
+                    '^(Economy|Comfort|ComfortPLUS|Business|Minivan)$'
+                ),
+                from_)],
             FROM: [MessageHandler(Filters.text & ~Filters.command, to_)],
             TO: [MessageHandler(Filters.text & ~Filters.command, res)]
         },
