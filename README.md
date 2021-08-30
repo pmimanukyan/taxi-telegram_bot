@@ -1,4 +1,4 @@
-# hse-taxi telegram bot
+# taxi telegram bot
  
 Summer internship project
 
