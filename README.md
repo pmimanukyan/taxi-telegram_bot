@@ -1,6 +1,6 @@
 # taxi telegram bot
  
-Summer internship project
+Summer practice project
 
 A telegram bot that finds the aggregator with the lowest cost of a taxi on a specific route. \
 Considered the two most popular taxi aggregators in Russia - Yandex-taxi and Citymobil
